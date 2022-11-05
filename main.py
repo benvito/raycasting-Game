@@ -12,6 +12,8 @@ pg.init()
 f1 = pg.font.Font(None, 80)
 f2 = pg.font.Font(None, 30)
 
+tempbackup = []
+coloredBlocks = []
 display = pg.display.set_mode((width, height))
 clock = pg.time.Clock()
 player = Player()
@@ -106,6 +108,16 @@ while True:
             menuActive = True
             menu.current_option_index = 0
 
+    if pg.key.get_pressed()[pg.K_z]:
+        try:
+            if doubleBack != True:
+                countOfDraw -= 1
+                print(countOfDraw)
+                blockMapTextures[coloredBlocks[0]] = str(tempbackup[0])
+                doubleBack = True
+        except:
+            pass
+
     if menuActive:
         pg.draw.rect(display, (9, 5, 5), (0, 0, width, height))
         menu.draw(display, half_width//2, 100, 75)
@@ -143,10 +155,16 @@ while True:
     for blockNow in blockMapTextures:
         if blockNow[0] - 70 < player.x < blockNow[0] + 140 and blockNow[1] - 70 < player.y < blockNow[1] + 130 and doubleDrawOff:
             if event.type == pg.MOUSEBUTTONDOWN and pg.mouse.get_pressed()[2] and countOfDraw < len(blocksActive):
+                tempbackup.clear()
+                coloredBlocks.clear()
+                tempbackup.append(blockMapTextures[blockNow])
                 blockMapTextures[blockNow] = blocksActive[list(blocksActive.keys())[countOfDraw]]
+                coloredBlocks.append(blockNow)
                 countOfDraw += 1
                 print(blocksActive)
                 doubleDrawOff = False
+                doubleBack = False
+
 
 
 

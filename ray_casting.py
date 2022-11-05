@@ -7,6 +7,7 @@ from settings import *
 textureV, textureH = 0, 0
 
 def rayCasting(display, player, minimapTempPlayer):
+    global textureV, textureH
     inBlockPos = {'left': player.x - player.x // blockSize * blockSize,
                   'right': blockSize - (player.x - player.x // blockSize * blockSize),
                   'top': player.y - player.y // blockSize * blockSize,

@@ -20,7 +20,7 @@ textMap = [
            "1...........22.....1.1.1",
            "1....1...............1.1",
            "111111.................11111",
-           "1..........322.........2...1",
+           "1..........322.........4...1",
            "1..............1.......11111",
            "1......1.....11111.....1",
            "1.....1111...1...1.....1",
@@ -66,4 +66,5 @@ textureSize = 512
 textureScale = textureSize // blockSize
 textures = {'1': pygame.image.load('colorWhiteWall.png'),
             '2': pygame.image.load('colorYellowWall.png'),
-            '3': pygame.image.load('colorBlue.png')}
+            '3': pygame.image.load('colorBlue.png'),
+            '4': pygame.image.load('robotlvl1.png')}
