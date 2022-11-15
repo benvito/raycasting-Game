@@ -39,3 +39,16 @@ class Menu:
                 pg.draw.rect(surf, (0, 100, 0), option_rect)
             surf.blit(option, option_rect)
 
+def quest():
+    tmp = []
+    for blockNeed in blockQuest:
+        if blockQuest[blockNeed] == '5':
+            if blockMapTextures[blockNeed] == '3':
+                tmp.append(1)
+        if blockQuest[blockNeed] == '6':
+            if blockMapTextures[blockNeed] == '2':
+                tmp.append(2)
+    if 1 in tmp and 2 in tmp:
+        return True
+    else:
+        return False

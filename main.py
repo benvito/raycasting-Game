@@ -3,10 +3,13 @@ import time
 from math import *
 
 import main
+import ray_casting
+import settings
 from settings import *
 from player import Player
 from func import *
-from ray_casting import *
+import ray_casting
+import levels
 import time as t
 pg.init()
 f1 = pg.font.Font(None, 80)
@@ -22,6 +25,8 @@ flat = pg.image.load('nebo2.png')
 blocksActive = {
 }
 blockClickAvaliable = False
+doubleQuest = True
+
 
 #Экран загрузки + Управлениеs
 # text1 = f1.render('WASD - Ходьба', True, (180, 0, 0))
@@ -76,7 +81,7 @@ while True:
     minimapTempPlayer = pg.draw.circle(display, pg.Color("yellow"), (player.x, player.y), 0)
 
 
-    rayCasting(display, player, minimapTempPlayer)
+    ray_casting.rayCasting(display, player, minimapTempPlayer)
 
     plPos = pg.draw.circle(display, pg.Color(12,169,11), (minimapTempPlayer.x // 8, minimapTempPlayer.y // 8), 2)
     pg.draw.circle(display, pg.Color(12,169,11), (minimapTempPlayer.x // 8, minimapTempPlayer.y // 8), 5)
@@ -165,7 +170,15 @@ while True:
                 doubleDrawOff = False
                 doubleBack = False
 
-
+    # quest
+    quest()
+    if quest() and doubleQuest:
+        settings.textMap = levels.textMaplvl1
+        settings.initMap(settings.textMap)
+        player.x = 160
+        player.y = 140
+    if quest():
+        doubleQuest = False
 
 
     clock.tick(0)
