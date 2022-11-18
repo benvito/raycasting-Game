@@ -25,7 +25,8 @@ flat = pg.image.load('nebo2.png')
 blocksActive = {
 }
 blockClickAvaliable = False
-doubleQuest = True
+doubleQuest = False
+timer = True
 
 
 #Экран загрузки + Управлениеs
@@ -48,6 +49,7 @@ def menuFalse():
 
 menu.add_option('Continue', menuFalse)
 menu.add_option(f'Pixels per ray: {numRays}', lambda: print(numRays))
+menu.add_option('Restart', lvlSwitch)
 menu.add_option('Quit', quit)
 
 menuActive = False
@@ -116,8 +118,8 @@ while True:
     if pg.key.get_pressed()[pg.K_z]:
         try:
             if doubleBack != True:
-                countOfDraw -= 1
-                print(countOfDraw)
+                if countOfDraw > 0:
+                    countOfDraw -= 1
                 blockMapTextures[coloredBlocks[0]] = str(tempbackup[0])
                 doubleBack = True
         except:
@@ -143,11 +145,15 @@ while True:
                 if event.type == pg.MOUSEBUTTONDOWN and pg.mouse.get_pressed()[0]:
                     for bb in blockMapTextures:
                         if blockOnes == bb:
-                            blocksActive[blockOnes] = blockMapTextures[blockOnes]
-                            blockMapTextures[blockOnes] = '1'
-                            print(blocksActive)
-                            blockClickAvaliable = False
-                            doubleDrawOff = False
+                            try:
+                                blocksActive[blockOnes] = blockMapTextures[blockOnes]
+                                blockMapTextures[blockOnes] = '1'
+                                print(blocksActive)
+                                print(len(blocksActive)-countOfDraw)
+                                blockClickAvaliable = False
+                                doubleDrawOff = False
+                            except:
+                                print('error in block color take')
         else:
             blockClickAvaliable = False
 
@@ -158,28 +164,27 @@ while True:
 
     # pos nearly block and drawing
     for blockNow in blockMapTextures:
+        questBlock = False
         if blockNow[0] - 70 < player.x < blockNow[0] + 140 and blockNow[1] - 70 < player.y < blockNow[1] + 130 and doubleDrawOff:
             if event.type == pg.MOUSEBUTTONDOWN and pg.mouse.get_pressed()[2] and countOfDraw < len(blocksActive):
-                tempbackup.clear()
-                coloredBlocks.clear()
-                tempbackup.append(blockMapTextures[blockNow])
-                blockMapTextures[blockNow] = blocksActive[list(blocksActive.keys())[countOfDraw]]
-                coloredBlocks.append(blockNow)
-                countOfDraw += 1
-                print(blocksActive)
-                doubleDrawOff = False
-                doubleBack = False
+                if blockMapTextures[blockNow] == '4':
+                    questBlock = True
+                if questBlock == False:
+                    tempbackup.clear()
+                    coloredBlocks.clear()
+                    tempbackup.append(blockMapTextures[blockNow])
+                    blockMapTextures[blockNow] = blocksActive[list(blocksActive.keys())[countOfDraw]]
+                    coloredBlocks.append(blockNow)
+                    countOfDraw += 1
+                    print(blocksActive)
+                    doubleDrawOff = False
+                    doubleBack = False
 
     # quest
-    quest()
-    if quest() and doubleQuest:
-        settings.textMap = levels.textMaplvl1
-        settings.initMap(settings.textMap)
-        player.x = 160
-        player.y = 140
-    if quest():
-        doubleQuest = False
-
+    if doubleQuest == False:
+        quest1()
+    if timer == True:
+        timeStop = t.time()
 
     clock.tick(0)
     pg.display.flip()

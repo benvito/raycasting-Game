@@ -34,6 +34,7 @@ height = 900
 half_width = width / 2
 half_height = height / 2
 
+numOfLvl = 1
 
 blockSize = 100
 

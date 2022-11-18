@@ -1,7 +1,10 @@
 import pygame as pg
 import time
 from math import *
+from threading import Timer
+import time as t
 
+import levels
 import main
 from ray_casting import *
 from settings import *
@@ -39,7 +42,20 @@ class Menu:
                 pg.draw.rect(surf, (0, 100, 0), option_rect)
             surf.blit(option, option_rect)
 
-def quest():
+def lvlSwitch():
+    import levels
+    settings.textMap = levels.levelsList[str(settings.numOfLvl)]
+    settings.initMap(settings.textMap)
+    main.tempbackup.clear()
+    main.coloredBlocks.clear()
+    main.blocksActive.clear()
+    main.countOfDraw = 0
+    main.blockClickAvaliable = 0
+    main.player.x = 160
+    main.player.y = 140
+    main.menuFalse()
+
+def quest1():
     tmp = []
     for blockNeed in blockQuest:
         if blockQuest[blockNeed] == '5':
@@ -49,6 +65,16 @@ def quest():
             if blockMapTextures[blockNeed] == '2':
                 tmp.append(2)
     if 1 in tmp and 2 in tmp:
+        lvlSwitchText = f1.render('Great job! Switching level...', None, (151, 153, 255))
+        main.display.blit(lvlSwitchText, (half_width / 2, half_height))
+        main.timer = False
+        if t.time() - main.timeStop > 2:
+            main.doubleQuest = True
+            settings.numOfLvl += 1
+            lvlSwitch()
         return True
     else:
+        main.doubleQuest = False
         return False
+
+

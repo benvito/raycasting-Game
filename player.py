@@ -44,4 +44,4 @@ class Player:
         if pygame.mouse.get_focused():
             diff = pygame.mouse.get_pos()[0] - half_width
             pygame.mouse.set_pos((half_width, half_height))
-            self.angle += diff * self.delta * 0.2
+            self.angle += diff * self.delta * 0.15
