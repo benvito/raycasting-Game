@@ -11,13 +11,19 @@ from func import *
 import ray_casting
 import levels
 import time as t
+from drawing import Drawing
+import threading
+
 pg.init()
 f1 = pg.font.Font(None, 80)
 f2 = pg.font.Font(None, 30)
 
+
+
 tempbackup = []
 coloredBlocks = []
-display = pg.display.set_mode((width, height))
+display = pg.display.set_mode((width, height), pg.FULLSCREEN)
+surf_map = pg.Surface(MAP_SIZE_SURF)
 clock = pg.time.Clock()
 player = Player()
 pg.mouse.set_visible(False)
@@ -27,7 +33,9 @@ blocksActive = {
 blockClickAvaliable = False
 doubleQuest = False
 timer = True
+fullscreenActive = True
 
+pg.display.set_caption('2.5D GAME')
 
 #Экран загрузки + Управлениеs
 # text1 = f1.render('WASD - Ходьба', True, (180, 0, 0))
@@ -39,24 +47,27 @@ timer = True
 # time.sleep(3)
 
 countOfDraw = 0
+enableMoving = True
 
 menu = Menu()
+drawing = Drawing(display, surf_map)
 
 def menuFalse():
     global menuActive
     menuActive = False
 
-
 menu.add_option('Continue', menuFalse)
-menu.add_option(f'Pixels per ray: {numRays}', lambda: print(numRays))
 menu.add_option('Restart', lvlSwitch)
+menu.add_option(f'Pixels per ray: {settings.numRays}', lambda: print(settings.numRays))
+menu.add_option('FullScreen', fullscreenSwicth)
 menu.add_option('Quit', quit)
-
+keyMultiDown = True
 menuActive = False
 
 while True:
 
     key2 = pg.key.get_pressed()
+
     tmpPosX = player.x
     tmpPosY = player.y
 
@@ -66,51 +77,33 @@ while True:
             quit()
 
     player.delta = delta_time()
-    player.move()
+    move_thread = threading.Thread(target=player.move, args=(enableMoving,) ,name='move_thread')
+    move_thread.start()
 
     display.fill((0, 0, 0))
 
-    #Небо
-    pg.draw.rect(display, (9,5,5), (0,0, width, half_height))
+    drawing.bg()
 
-    #display.blit(flat, (0, 0, width, half_height))
+    pg.draw.circle(display, pg.Color("yellow"), (player.x, player.y), 0)
 
+    drawing.world(player)
 
-    #Пол
-    pg.draw.rect(display, (9,5,5), (0, half_height, width, half_height))
-
-
-    minimapTempPlayer = pg.draw.circle(display, pg.Color("yellow"), (player.x, player.y), 0)
-
-
-    ray_casting.rayCasting(display, player, minimapTempPlayer)
-
-    plPos = pg.draw.circle(display, pg.Color(12,169,11), (minimapTempPlayer.x // 8, minimapTempPlayer.y // 8), 2)
-    pg.draw.circle(display, pg.Color(12,169,11), (minimapTempPlayer.x // 8, minimapTempPlayer.y // 8), 5)
-
-    for x,y in blockMap:
-        minimapTempMap = pg.draw.rect(display, pg.Color('gray'), (x // 8, y // 8, blockSize // 8, blockSize // 8), 0)
-        if minimapTempMap.colliderect(plPos):
-            player.x = tmpPosX
-            player.y = tmpPosY
+    #Minimap
+    mini_map_thread = threading.Thread(target=drawing.mini_map, args=(player,), name='MiniMap')
+    mini_map_thread.start()
 
 
 
-    pg.display.set_caption('2.5D GAME')
+    drawing.info(clock, player)
 
-    fps = f2.render(("FPS: " + str(int(clock.get_fps()))), True, (114,160,193))
-    positions = f2.render(("   X:   " + str(int(player.x)) + "   Y:   " + str(int(player.y))), True, (114, 160, 193))
-    speedHud = f2.render(('Speed:  ' + str(player.speed)), True, (114, 160, 193))
-    clickAble = f2.render('Нажмите "SPACE" чтобы действовать', True, (255,178,213))
-    display.blit(fps, (1500,10))
-    display.blit(positions, (1400,30))
-    display.blit(speedHud, (1465,50))
+    clickAble = f2.render('Нажмите "SPACE" чтобы действовать', True, (255, 178, 213))
 
 
     # menu
     if event.type == pg.KEYDOWN:
         if pg.key.get_pressed()[pg.K_ESCAPE] and menuActive:
             menuActive = False
+            t.sleep(0.1)
         elif pg.key.get_pressed()[pg.K_ESCAPE] and not menuActive:
             menuActive = True
             menu.current_option_index = 0
@@ -125,16 +118,35 @@ while True:
         except:
             pass
 
+
     if menuActive:
+        enableMoving = False
+        pg.mouse.set_visible(True)
         pg.draw.rect(display, (9, 5, 5), (0, 0, width, height))
         menu.draw(display, half_width//2, 100, 75)
-        if event.type == pg.KEYDOWN:
-            if pg.key.get_pressed()[pg.K_DOWN]:
+        keyMenu = pg.key.get_pressed()
+        if keyMultiDown:
+            if keyMenu[pg.K_DOWN]:
                 menu.switch(1)
-            if pg.key.get_pressed()[pg.K_UP]:
+                keyMultiDown = False
+                timing = t.time()
+            if keyMenu[pg.K_UP]:
                 menu.switch(-1)
-            if pg.key.get_pressed()[pg.K_RETURN]:
+                keyMultiDown = False
+                timing = t.time()
+            if keyMenu[pg.K_RETURN]:
                 menu.select()
+                keyMultiDown = False
+                timing = t.time()
+        else:
+            if t.time() - timing > 0.18:
+                keyMultiDown = True
+
+    else:
+        pg.mouse.set_visible(False)
+        enableMoving = True
+
+
     doubleDrawOff = True
     # Убирание окраски
     for blockOnes in blockOne:
@@ -180,11 +192,13 @@ while True:
                     doubleDrawOff = False
                     doubleBack = False
 
+
     # quest
     if doubleQuest == False:
         quest1()
     if timer == True:
         timeStop = t.time()
+
 
     clock.tick(0)
     pg.display.flip()

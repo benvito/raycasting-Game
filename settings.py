@@ -1,16 +1,17 @@
 from math import *
-
 import pygame.image
-
+import pygame
 import levels
+import ray_casting
 
 # 1 - white
 # 2 - yellow
 # 3 - blue
 # 4 - color quest guy
-# 5 - need 3
-# 6 - need 2
-import ray_casting
+# 5 - need blue(3)
+# 6 - need yellow(2)
+
+pygame.init()
 
 textMap = [
            "111111111111111111111111",
@@ -29,6 +30,8 @@ textMap = [
            "111111111111111111111111",
            ]
 
+maxSize = pygame.display.Info()
+
 width = 1600
 height = 900
 half_width = width / 2
@@ -38,6 +41,10 @@ numOfLvl = 1
 
 blockSize = 100
 
+MAPSCALE = 8
+MAP_SIZE_SURF = (width//MAPSCALE*1.5, height//MAPSCALE*1.55)
+MAPPOS = (0, 0)
+MAP_BLOCK_SIZE = blockSize//MAPSCALE
 
 mapWidth = len(textMap[0])
 mapHeight = len(textMap)
@@ -46,18 +53,24 @@ blockMapTextures = {
 
 }
 
+mini_map = set()
+
 blockMap = set()
 yBlockPos = 0
 blockOne = list()
 blockQuest = {
 
 }
+collision_walls = []
+
 for row in textMap:
     xBlockPos = 0
     for column in list(row):
         if column != '.':
             blockMap.add((xBlockPos, yBlockPos))
+            mini_map.add((xBlockPos//MAPSCALE, yBlockPos//MAPSCALE))
             blockMapTextures[(xBlockPos, yBlockPos)] = column
+            collision_walls.append(pygame.Rect(xBlockPos, yBlockPos, blockSize, blockSize))
         if column == '2' or column == '3':
             blockOne.append((xBlockPos, yBlockPos))
         if column == '5' or column == '6':
@@ -65,17 +78,15 @@ for row in textMap:
         xBlockPos += blockSize
     yBlockPos += blockSize
 
-
 FOV = pi / 2
 halfFOV = FOV / 2
 maxDepth = width // blockSize
 numRays = 400
 deltaRays = FOV / (numRays - 1)
 dist = numRays / (2 * tan(halfFOV))
-coef = dist * blockSize * 7
+coef = dist * blockSize * 6
 scale = width // numRays
 depthCoef = 2
-
 
 textureSize = 512
 textureScale = textureSize // blockSize
@@ -91,17 +102,20 @@ def initMap(textMap):
     blockQuest.clear()
     blockMapTextures.clear()
     blockOne.clear()
+    mini_map.clear()
+    collision_walls.clear()
     yBlockPos = 0
     for row in textMap:
         xBlockPos = 0
         for column in list(row):
             if column != '.':
                 blockMap.add((xBlockPos, yBlockPos))
+                mini_map.add((xBlockPos // MAPSCALE, yBlockPos // MAPSCALE))
                 blockMapTextures[(xBlockPos, yBlockPos)] = column
+                collision_walls.append(pygame.Rect(xBlockPos, yBlockPos, blockSize, blockSize))
             if column == '2' or column == '3':
                 blockOne.append((xBlockPos, yBlockPos))
             if column == '5' or column == '6':
                 blockQuest[(xBlockPos, yBlockPos)] = column
             xBlockPos += blockSize
         yBlockPos += blockSize
-

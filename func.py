@@ -2,6 +2,9 @@ import pygame as pg
 import time
 from math import *
 from threading import Timer
+
+import pygame.event
+from numba import njit
 import time as t
 
 import levels
@@ -12,6 +15,7 @@ pg.font.init()
 f1 = pg.font.Font(None, 80)
 
 cur_time = time.time_ns()
+
 def delta_time():
     global cur_time
     delta = (time.time_ns() - cur_time) / 1000000000
@@ -40,7 +44,14 @@ class Menu:
             option_rect.topleft = (x, y + i * option_y)
             if i == self.current_option_index:
                 pg.draw.rect(surf, (0, 100, 0), option_rect)
-            surf.blit(option, option_rect)
+            b = surf.blit(option, option_rect)
+            pos = pygame.mouse.get_pos()
+            if b.collidepoint(pos):
+                self.current_option_index = i
+                for event in pg.event.get():
+                    if pg.mouse.get_pressed()[0]:
+                        self.select()
+
 
 def lvlSwitch():
     import levels
@@ -77,4 +88,17 @@ def quest1():
         main.doubleQuest = False
         return False
 
+def fullscreenSwicth():
+    if not main.fullscreenActive:
+        main.display = pg.display.set_mode((width, height), pg.FULLSCREEN)
+        main.fullscreenActive = True
+        return
+    if main.fullscreenActive:
+        main.display = pg.display.set_mode((width, height), pg.RESIZABLE)
+        main.fullscreenActive = False
+        return
 
+def keyMultiDownTimer():
+    timing = t.time()
+    if t.time() - timing > 2:
+        main.keyMultiDown = True

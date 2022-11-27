@@ -1,13 +1,12 @@
 import pygame as pg
 import time
 from math import *
-
 import settings
 from settings import *
-
+from PIL import Image
 textureV, textureH = 0, 0
 
-def rayCasting(display, player, minimapTempPlayer):
+def rayCasting(display, player):
     try:
         global textureV, textureH
         inBlockPos = {'left': player.x - player.x // blockSize * blockSize,
@@ -47,8 +46,8 @@ def rayCasting(display, player, minimapTempPlayer):
                     break
 
             ray_size = min(vl, hl) * depthCoef
-            toX, toY = (ray_size // 15) * cos(cur_angle) + minimapTempPlayer.x // 8, (ray_size // 15) * sin(cur_angle) + minimapTempPlayer.y // 8
-            pg.draw.line(display, pg.Color(175, 175, 8), (minimapTempPlayer.x // 8, minimapTempPlayer.y // 8), (toX, toY), 1)
+            toX, toY = ray_size * cos(cur_angle) + player.x, ray_size * sin(cur_angle) + player.y
+            #pg.draw.line(display, pg.Color("yellow"), (minimapTempPlayer.x, minimapTempPlayer.y), (toX, toY))
 
             if hl > vl:
                 ray_size = vl
@@ -68,9 +67,19 @@ def rayCasting(display, player, minimapTempPlayer):
 
             ray_size += cos(player.angle - cur_angle)
             height_c = coef / (ray_size + 0.0001)
+            c = height_c
+            textures[textNum].set_alpha(c)
             wallLine = textures[textNum].subsurface(mr * textureScale, 0, textureScale, textureSize)
-            wallLine = pg.transform.scale(wallLine, (scale, int(height_c)))
+            wallLine = pg.transform.scale(wallLine, (scale, int(height_c))).convert_alpha()
             display.blit(wallLine, (ray * scale, half_height - height_c // 2))
+            # elif textNum == '2':
+            #     c = 255 / (1 + ray_size ** 2 * 0.0000005)
+            #     color = (c//1.05, c, c//10)
+            #     block = pg.draw.rect(display, color, (ray * scale, half_height - height_c // 2, scale, height_c))
+            # else:
+            #     c = 255 / (1 + ray_size ** 2 * 0.0000005)
+            #     color = (c, c, c)
+            #     block = pg.draw.rect(display, color, (ray * scale, half_height - height_c // 2, scale, height_c))
 
             # flat = textureFlat
             # display.blit(flat, (0, 0, width, half_height))
