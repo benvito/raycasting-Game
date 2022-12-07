@@ -1,12 +1,14 @@
 from math import *
 import pygame.key
 
+import main
+import settings
 from settings import *
 
 class Player:
     def __init__(self):
-        self.x = 140
-        self.y = 160
+        self.x = 160
+        self.y = 140
         self.angle = 0
         self.delta = 0
         self.speed = 100
@@ -32,12 +34,13 @@ class Player:
                     delta_y += next_rect.bottom - hit_rect.top
                 else:
                     delta_y += hit_rect.bottom - next_rect.top
-            if abs(delta_x - delta_y) < 10:
+            if abs(delta_x - delta_y) < 50:
                 dx, dy = 0, 0
             elif delta_x > delta_y:
                 dy = 0
             elif delta_y > delta_x:
                 dx = 0
+
         self.x += dx
         self.y += dy
 

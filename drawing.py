@@ -2,6 +2,7 @@ import pygame as pg
 from settings import *
 from math import *
 from ray_casting import rayCasting
+import asyncio
 
 class Drawing:
     def __init__(self, surf, surf_map):

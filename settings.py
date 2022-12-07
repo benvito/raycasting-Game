@@ -4,31 +4,31 @@ import pygame
 import levels
 import ray_casting
 
+ui = {
+    'mouse1' : pygame.image.load("mouse1_button.png"),
+    'mouse2' : pygame.image.load("mouse2_button.png"),
+    'mouse3' : pygame.image.load("mouse3_button.png"),
+    '3' : pygame.image.load("blue_ui.png"),
+    '2' : pygame.image.load("yellow_ui.png"),
+    '4' : pygame.image.load("red_ui.png"),
+    '5' : pygame.image.load("green_ui.png"),
+    'wrong' : pygame.image.load("wrong_ui.png"),
+
+}
+
 # 1 - white
 # 2 - yellow
 # 3 - blue
 # 4 - color quest guy
 # 5 - need blue(3)
 # 6 - need yellow(2)
+# 7 - red
+# 8 - blue
 
 pygame.init()
 
-textMap = [
-           "111111111111111111111111",
-           "1......................1",
-           "1....2.................1",
-           "1....2............111111",
-           "1...........22.....1.1.1",
-           "1....1...............1.1",
-           "111111.................5",
-           "1..........322.........4",
-           "1..............1.......6",
-           "1......1.....11111.....1",
-           "1.....1111...1...1.....1",
-           "1......1...............1",
-           "1......................1",
-           "111111111111111111111111",
-           ]
+textMap = levels.levelsList['2']
+numOfLvl = 2
 
 maxSize = pygame.display.Info()
 
@@ -37,13 +37,15 @@ height = 900
 half_width = width / 2
 half_height = height / 2
 
-numOfLvl = 1
+
 
 blockSize = 100
+rangeColBlock = blockSize//2
+rangeColBlockPlus = blockSize*2
 
 MAPSCALE = 8
-MAP_SIZE_SURF = (width//MAPSCALE*1.5, height//MAPSCALE*1.55)
 MAPPOS = (0, 0)
+MAP_SIZE_SURF = (width//MAPSCALE*1.5, height//MAPSCALE*1.55)
 MAP_BLOCK_SIZE = blockSize//MAPSCALE
 
 mapWidth = len(textMap[0])
@@ -62,40 +64,7 @@ blockQuest = {
 
 }
 collision_walls = []
-
-for row in textMap:
-    xBlockPos = 0
-    for column in list(row):
-        if column != '.':
-            blockMap.add((xBlockPos, yBlockPos))
-            mini_map.add((xBlockPos//MAPSCALE, yBlockPos//MAPSCALE))
-            blockMapTextures[(xBlockPos, yBlockPos)] = column
-            collision_walls.append(pygame.Rect(xBlockPos, yBlockPos, blockSize, blockSize))
-        if column == '2' or column == '3':
-            blockOne.append((xBlockPos, yBlockPos))
-        if column == '5' or column == '6':
-            blockQuest[(xBlockPos, yBlockPos)] = column
-        xBlockPos += blockSize
-    yBlockPos += blockSize
-
-FOV = pi / 2
-halfFOV = FOV / 2
-maxDepth = width // blockSize
-numRays = 400
-deltaRays = FOV / (numRays - 1)
-dist = numRays / (2 * tan(halfFOV))
-coef = dist * blockSize * 6
-scale = width // numRays
-depthCoef = 2
-
-textureSize = 512
-textureScale = textureSize // blockSize
-textures = {'1': pygame.image.load('colorWhiteWall.png'),
-            '2': pygame.image.load('colorYellowWall.png'),
-            '3': pygame.image.load('colorBlue.png'),
-            '4': pygame.image.load('robotlvl1.png'),
-            '5': pygame.image.load('colorWhiteWall.png'),
-            '6': pygame.image.load('colorWhiteWall.png')}
+collision_walls_draw = []
 
 def initMap(textMap):
     blockMap.clear()
@@ -113,9 +82,47 @@ def initMap(textMap):
                 mini_map.add((xBlockPos // MAPSCALE, yBlockPos // MAPSCALE))
                 blockMapTextures[(xBlockPos, yBlockPos)] = column
                 collision_walls.append(pygame.Rect(xBlockPos, yBlockPos, blockSize, blockSize))
-            if column == '2' or column == '3':
+            if column == '2' or column == '3' or column == '4' or column == '5' or column == 'o':
                 blockOne.append((xBlockPos, yBlockPos))
-            if column == '5' or column == '6':
+            if column == '!' or column == '@' or column == '$' or column == '%':
                 blockQuest[(xBlockPos, yBlockPos)] = column
             xBlockPos += blockSize
         yBlockPos += blockSize
+initMap(textMap)
+
+print(collision_walls_draw)
+print(blockOne)
+
+FOV = pi / 2
+halfFOV = FOV / 2
+maxDepth = width // blockSize
+numRays = 400
+deltaRays = FOV / (numRays - 1)
+dist = numRays / (2 * tan(halfFOV))
+coef = dist * blockSize * 6
+scale = width // numRays
+depthCoef = 2
+
+textureSize = 512
+textureScale = textureSize // blockSize
+textures = {
+            '1': pygame.image.load('colorWhiteWall.png'),
+            '2': pygame.image.load('colorYellowWall.png'),
+            '3': pygame.image.load('colorBlueWall.png'),
+            '4': pygame.image.load('colorRedWall.png'),
+            '5': pygame.image.load('colorGreenWall.png'),
+            '<': pygame.image.load('robot.png'),
+            '!': pygame.image.load('blockWallNeedYellow.png'),
+            '@': pygame.image.load('blockWallNeedBlue.png'),
+            '$': pygame.image.load('blockWallNeedRed.png'),
+            '%': pygame.image.load('blockWallNeedGreen.png'),
+            'o': pygame.image.load('blockNumberOne.png'),
+
+            # '4': pygame.image.load('robot.png'),
+            # '5': pygame.image.load('colorWhiteWall.png'),
+            # '6': pygame.image.load('colorWhiteWall.png'),
+            # '7': pygame.image.load('colorRedWall.png'),
+            # '8': pygame.image.load('colorGreenWall.png'),
+            }
+
+

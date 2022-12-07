@@ -4,8 +4,11 @@ from math import *
 from threading import Timer
 
 import pygame.event
-from numba import njit
 import time as t
+
+import asyncio
+
+import random as rn
 
 import levels
 import main
@@ -60,21 +63,34 @@ def lvlSwitch():
     main.tempbackup.clear()
     main.coloredBlocks.clear()
     main.blocksActive.clear()
+    main.tempbackup_color.clear()
+    main.block_in_bag.clear()
+    main.blocks_draw_avaliable.clear()
     main.countOfDraw = 0
     main.blockClickAvaliable = 0
     main.player.x = 160
     main.player.y = 140
     main.menuFalse()
 
-def quest1():
+def quest(lvl):
     tmp = []
-    for blockNeed in blockQuest:
-        if blockQuest[blockNeed] == '5':
-            if blockMapTextures[blockNeed] == '3':
-                tmp.append(1)
-        if blockQuest[blockNeed] == '6':
-            if blockMapTextures[blockNeed] == '2':
-                tmp.append(2)
+    if lvl == 1:
+        for blockNeed in blockQuest:
+            if blockQuest[blockNeed] == '@':
+                if blockMapTextures[blockNeed] == '3':
+                    tmp.append(1)
+            if blockQuest[blockNeed] == '!':
+                if blockMapTextures[blockNeed] == '2':
+                    tmp.append(2)
+    elif lvl == 2:
+        for blockNeed in blockQuest:
+                if blockQuest[blockNeed] == '$':
+                    if blockMapTextures[blockNeed] == '4':
+                        tmp.append(1)
+                if blockQuest[blockNeed] == '%':
+                    if blockMapTextures[blockNeed] == '5':
+                        tmp.append(2)
+    
     if 1 in tmp and 2 in tmp:
         lvlSwitchText = f1.render('Great job! Switching level...', None, (151, 153, 255))
         main.display.blit(lvlSwitchText, (half_width / 2, half_height))
@@ -102,3 +118,50 @@ def keyMultiDownTimer():
     timing = t.time()
     if t.time() - timing > 2:
         main.keyMultiDown = True
+
+def epilepcy(textMap):
+    text = textMap
+    words = []
+    for row in text:
+        words.append(row)
+        for i, char in enumerate(map(list, words)):
+            rn.shuffle(char)
+            char[0],char[-1] = '1', '1'   
+            words[i] = ''.join(char)
+    initMap(words)
+
+def randomColorBlockMap(textMap):
+    timer = t.perf_counter()
+    text = textMap
+    newTextMap = []
+    generatedMap = []
+    for row in text:
+        roww = []
+        for column in row:
+            roww.append(column)
+        newTextMap.append(roww)
+    textsForShuffle = []
+    for row in text:
+        for column in row:
+            if column != '.' and column != '<' and column != '$' and column != '%' and column != '@' and column != '!':
+                textsForShuffle.append(column)
+    xy_original = []
+    for y, row in enumerate(text):
+        for x, column in enumerate(row):
+            if column != '.' and column != '<' and column != '$' and column != '%' and column != '@' and column != '!':
+                xy_original.append([x,y])
+    xy_tmp = xy_original
+    for y, row in enumerate(newTextMap):       
+        for x, column in enumerate(row):
+            if column != '.' and column != '<' and column != '$' and column != '%' and column != '@' and column != '!':
+                ch = rn.choice(textsForShuffle)
+                newTextMap[y][x] = ch
+                textsForShuffle.remove(ch)
+
+    for row in newTextMap:
+        generatedMap.append(''.join(row))
+
+    initMap(generatedMap)
+    
+
+
