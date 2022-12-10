@@ -20,7 +20,6 @@ pg.init()
 f1 = pg.font.Font(None, 80)
 f2 = pg.font.Font(None, 30)
 
-
 tempbackup = []
 coloredBlocks = []
 display = pg.display.set_mode((width, height), pg.RESIZABLE)
@@ -28,11 +27,9 @@ surf_map = pg.Surface(MAP_SIZE_SURF)
 clock = pg.time.Clock()
 player = Player()
 pg.mouse.set_visible(False)
-flat = pg.image.load('nebo2.png')
 blocksActive = {
 }
 blocks_draw_avaliable = {
-
 }
 blockClickAvaliable = False
 doubleQuest = False
@@ -40,9 +37,6 @@ timer = True
 fullscreenActive = True
 
 pg.display.set_caption('2.5D GAME')
-
-clickAble = f2.render('Нажмите "SPACE" чтобы действовать', True, (255, 178, 213))
-
 
 #Экран загрузки + Управлениеs
 # text1 = f1.render('WASD - Ходьба', True, (180, 0, 0))
@@ -61,6 +55,8 @@ menu = Menu()
 drawing = Drawing(display, surf_map)
 
 minimapActive = True
+def close():
+    quit()
 def menuFalse():
     global menuActive
     menuActive = False
@@ -76,23 +72,27 @@ menu.add_option('Restart', lvlSwitch)
 menu.add_option(f'Pixels per ray: {settings.numRays}', lambda: print(settings.numRays))
 menu.add_option('FullScreen', fullscreenSwicth)
 menu.add_option('Minimap', minimapSwitch)
-menu.add_option('Quit', quit)
+menu.add_option('Quit', close)
 keyMultiDown = True
 menuActive = False
 
 doubleBack = True
-
 tempbackup_color = []
 block_in_bag = []
 timeTimer = t.perf_counter()
 runningGame = True
 timerFrame = 0
 timerSeconds = 0
+
 while runningGame:
     fps = clock.get_fps()+1
-    if textMap == levels.levelsList['5']:
-        if timerFrame / fps > 1:
-            randomColorBlockMap(textMap)
+    if settings.textMap == levels.levelsList['5']:
+        if timerFrame / fps > 3:
+            randomColorBlockMap(settings.textMap)
+            timerFrame = 0
+    if settings.textMap == levels.levelsList['6']:
+        if timerFrame / fps > 2:
+            randomColorBlockMap(settings.textMap)
             timerFrame = 0
     key2 = pg.key.get_pressed()
 
@@ -207,7 +207,7 @@ while runningGame:
                         tempbackup_color.clear()
                         tempbackup.clear()
                         coloredBlocks.clear()
-                        block_in_bag.pop(-1)
+                        block_in_bag.pop(-1) 
                         tempbackup.append(blockMapTextures[blockNow])
                         tempbackup_color.append(blocks_draw_avaliable[list(blocks_draw_avaliable.keys())[-1]])
                         print('tempbackup_color : ', tempbackup_color)

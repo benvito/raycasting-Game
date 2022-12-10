@@ -3,10 +3,12 @@ import time
 from math import *
 from threading import Timer
 
+import settings
 import pygame.event
 import time as t
 
 import asyncio
+import os
 
 import random as rn
 
@@ -18,6 +20,8 @@ pg.font.init()
 f1 = pg.font.Font(None, 80)
 
 cur_time = time.time_ns()
+
+level5_quest = set()
 
 def delta_time():
     global cur_time
@@ -57,9 +61,8 @@ class Menu:
 
 
 def lvlSwitch():
-    import levels
     settings.textMap = levels.levelsList[str(settings.numOfLvl)]
-    settings.initMap(settings.textMap)
+    print(settings.numOfLvl)
     main.tempbackup.clear()
     main.coloredBlocks.clear()
     main.blocksActive.clear()
@@ -68,41 +71,85 @@ def lvlSwitch():
     main.blocks_draw_avaliable.clear()
     main.countOfDraw = 0
     main.blockClickAvaliable = 0
-    main.player.x = 160
-    main.player.y = 140
+    if settings.numOfLvl == 2:
+        main.player.x = 250
+        main.player.y = 300
+    elif settings.numOfLvl == 3:
+        main.player.x = 2250
+        main.player.y = 150
+    else:
+        main.player.x = 160
+        main.player.y = 150
     main.menuFalse()
+    settings.initMap(settings.textMap)
+
+
+
+def switcher():   
+    main.display.blit(ui[f'lvl{settings.numOfLvl+1}'], (0,0))
+    main.timer = False
+    if pg.key.get_pressed()[pg.K_SPACE]:
+        level5_quest.clear()
+        main.doubleQuest = True 
+        settings.numOfLvl += 1 
+        lvlSwitch()
+        main.timer = True
+    
 
 def quest(lvl):
     tmp = []
-    if lvl == 1:
-        for blockNeed in blockQuest:
-            if blockQuest[blockNeed] == '@':
-                if blockMapTextures[blockNeed] == '3':
-                    tmp.append(1)
-            if blockQuest[blockNeed] == '!':
-                if blockMapTextures[blockNeed] == '2':
-                    tmp.append(2)
-    elif lvl == 2:
-        for blockNeed in blockQuest:
-                if blockQuest[blockNeed] == '$':
-                    if blockMapTextures[blockNeed] == '4':
-                        tmp.append(1)
-                if blockQuest[blockNeed] == '%':
-                    if blockMapTextures[blockNeed] == '5':
-                        tmp.append(2)
-    
-    if 1 in tmp and 2 in tmp:
-        lvlSwitchText = f1.render('Great job! Switching level...', None, (151, 153, 255))
-        main.display.blit(lvlSwitchText, (half_width / 2, half_height))
-        main.timer = False
-        if t.time() - main.timeStop > 2:
-            main.doubleQuest = True
-            settings.numOfLvl += 1
-            lvlSwitch()
-        return True
-    else:
-        main.doubleQuest = False
-        return False
+    for blockNeed in blockQuest:
+        if blockQuest[blockNeed] == '@':
+            if blockMapTextures[blockNeed] == '3':
+                tmp.append(1)
+                if settings.numOfLvl == 5:
+                    level5_quest.add(1)
+        if blockQuest[blockNeed] == '!':
+            if blockMapTextures[blockNeed] == '2':
+                tmp.append(2)
+                if settings.numOfLvl == 5:
+                    level5_quest.add(2)
+                    
+        if blockQuest[blockNeed] == '$':
+            if blockMapTextures[blockNeed] == '4':
+                tmp.append(3)
+                if settings.numOfLvl == 5:
+                    level5_quest.add(3)
+        if blockQuest[blockNeed] == '%':
+            if blockMapTextures[blockNeed] == '5':
+                tmp.append(4)
+                if settings.numOfLvl == 5:
+                    level5_quest.add(4)
+    if settings.numOfLvl <= 2:
+        if len(tmp) >= 2:
+            switcher()
+            return True
+        else:
+            main.doubleQuest = False
+            return False
+    elif settings.numOfLvl == 4 or settings.numOfLvl == 3:
+        if len(tmp) >= 3:
+            switcher()
+            return True
+        else:
+            main.doubleQuest = False
+            return False
+    elif settings.numOfLvl == 5:
+        lvl5 = f1.render(f'Painted: {len(level5_quest)}/4', None, (151, 153, 255))
+        main.display.blit(lvl5, (half_width/2-50, 20))
+        if len(level5_quest) >= 4:
+            switcher()
+            return True
+        else:
+            main.doubleQuest = False
+            return False
+    elif settings.numOfLvl == 6:
+        if len(tmp) >= 2:
+            switcher()
+            return True
+        else:
+            main.doubleQuest = False
+            return False
 
 def fullscreenSwicth():
     if not main.fullscreenActive:
@@ -149,15 +196,17 @@ def randomColorBlockMap(textMap):
     for y, row in enumerate(text):
         for x, column in enumerate(row):
             if column != '.' and column != '<' and column != '$' and column != '%' and column != '@' and column != '!':
-                xy_original.append([x,y])
+                if (x*blockSize, y*blockSize) not in list(settings.blockQuest.keys()):
+                    xy_original.append([x,y])
     xy_tmp = xy_original
     for y, row in enumerate(newTextMap):       
         for x, column in enumerate(row):
             if column != '.' and column != '<' and column != '$' and column != '%' and column != '@' and column != '!':
-                ch = rn.choice(textsForShuffle)
-                newTextMap[y][x] = ch
-                textsForShuffle.remove(ch)
-
+                if (x*blockSize, y*blockSize) not in list(settings.blockQuest.keys()):  
+                    ch = rn.choice(textsForShuffle)
+                    newTextMap[y][x] = ch
+                    textsForShuffle.remove(ch)
+                
     for row in newTextMap:
         generatedMap.append(''.join(row))
 

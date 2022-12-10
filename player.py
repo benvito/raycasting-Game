@@ -7,8 +7,12 @@ from settings import *
 
 class Player:
     def __init__(self):
-        self.x = 160
-        self.y = 140
+        # self.x = 350
+        # self.y = 350
+        # self.x = 160
+        # self.y = 150
+        self.x = 500
+        self.y = 480
         self.angle = 0
         self.delta = 0
         self.speed = 100
@@ -55,7 +59,7 @@ class Player:
             if self.speed >= 200:
                 self.speed = 200
         else:
-            self.speed = 100
+            self.speed = 500
 
         self.mouse_control(active=active)
         # if key2[pygame.K_ESCAPE]:
