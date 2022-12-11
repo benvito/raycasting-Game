@@ -77,13 +77,28 @@ def lvlSwitch():
     elif settings.numOfLvl == 3:
         main.player.x = 2250
         main.player.y = 150
+    elif settings.numOfLvl == 9:
+        main.player.x = 160
+        main.player.y = 150
+        settings.textures['2'] = pygame.image.load('textures/colorYellowWallBlack.png').convert()
+        settings.textures['3'] =  pygame.image.load('textures/colorBlueWallBlack.png').convert()
+        settings.textures['4'] =  pygame.image.load('textures/colorRedWallBlack.png').convert()
+        settings.textures['5'] =  pygame.image.load('textures/colorGreenWallBlack.png').convert()
+        settings.textures['<'] =  pygame.image.load('textures/robotBlack.png').convert()
     else:
         main.player.x = 160
         main.player.y = 150
     main.menuFalse()
     settings.initMap(settings.textMap)
 
-
+def restart():
+    main.display.blit(ui[f'lvl{settings.numOfLvl}'], (0,0))
+    if pg.key.get_pressed()[pg.K_SPACE]: 
+        main.restartBool = False
+        main.player.x = 160
+        main.player.y = 150
+        lvlSwitch()
+        
 
 def switcher():   
     main.display.blit(ui[f'lvl{settings.numOfLvl+1}'], (0,0))
@@ -143,8 +158,15 @@ def quest(lvl):
         else:
             main.doubleQuest = False
             return False
-    elif settings.numOfLvl == 6:
+    elif settings.numOfLvl == 6 or settings.numOfLvl == 7:
         if len(tmp) >= 2:
+            switcher()
+            return True
+        else:
+            main.doubleQuest = False
+            return False
+    elif settings.numOfLvl == 8:
+        if len(tmp) >= 3:
             switcher()
             return True
         else:

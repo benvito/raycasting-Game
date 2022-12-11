@@ -4,6 +4,7 @@ from math import *
 import settings
 from settings import *
 from PIL import Image
+from numpy import arange
 textureV, textureH = 0, 0
 
 def rayCasting(display, player):

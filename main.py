@@ -66,9 +66,15 @@ def minimapSwitch():
         minimapActive = True
     else:
         minimapActive = False
+restartBool = False
+def restartBoolChange():
+    global restartBool
+    restartBool = True
+
+
 
 menu.add_option('Continue', menuFalse)
-menu.add_option('Restart', lvlSwitch)
+menu.add_option('Restart', restartBoolChange)
 menu.add_option(f'Pixels per ray: {settings.numRays}', lambda: print(settings.numRays))
 menu.add_option('FullScreen', fullscreenSwicth)
 menu.add_option('Minimap', minimapSwitch)
@@ -82,7 +88,6 @@ block_in_bag = []
 timeTimer = t.perf_counter()
 runningGame = True
 timerFrame = 0
-timerSeconds = 0
 
 while runningGame:
     fps = clock.get_fps()+1
@@ -94,6 +99,20 @@ while runningGame:
         if timerFrame / fps > 2:
             randomColorBlockMap(settings.textMap)
             timerFrame = 0
+    if settings.textMap == levels.levelsList['7']:
+        if timerFrame / 60 > 11:
+            randomColorBlockMap(settings.textMap)
+            timerFrame = 0
+        else:
+            remain = f1.render(str(round(11 - timerFrame / 60)), True, (255,255,255))
+    if settings.textMap == levels.levelsList['8']:
+        if timerFrame / 60 > 35:
+            randomColorBlockMap(settings.textMap)
+            timerFrame = 0
+        else:
+            remain = f1.render(str(round(35 - timerFrame / 60)), True, (255,255,255))
+        
+        
     key2 = pg.key.get_pressed()
 
     # от "Приложение не отвечает"
@@ -246,13 +265,24 @@ while runningGame:
     else:
         pg.mouse.set_visible(False)
         enableMoving = True
+    if settings.numOfLvl == 7 or settings.numOfLvl == 8:
+        display.blit(remain, (half_width//2-160, 20))
+    if settings.textMap == levels.levelsList['9']:
+        if menuActive:
+            lvl9 = f2.render('You can restart a lvl to see a guide', None, (166,216,19))
+            display.blit(lvl9, (half_width-200,height-50))
 
+    if restartBool:
+        restart()
     # quest
     quest(numOfLvl)
     if timer == True:
         timeStop = t.time()
+    if fps < 45:
+        timerFrame+=2
+    else:
+        timerFrame+=1
 
-    timerFrame+=1
     clock.tick(60)
     pg.display.flip()
 

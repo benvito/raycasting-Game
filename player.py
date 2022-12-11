@@ -9,10 +9,11 @@ class Player:
     def __init__(self):
         # self.x = 350
         # self.y = 350
-        # self.x = 160
-        # self.y = 150
-        self.x = 500
-        self.y = 480
+        self.x = 160
+        self.y = 150
+        # self.x = 500
+        # self.y = 480
+
         self.angle = 0
         self.delta = 0
         self.speed = 100

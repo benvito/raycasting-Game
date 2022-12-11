@@ -19,6 +19,11 @@ ui = {
     'lvl4' : pygame.image.load("textures/lvl4_guide.png"),
     'lvl5' : pygame.image.load("textures/lvl5_guide.png"),
     'lvl6' : pygame.image.load("textures/lvl6_guide.png"),
+    'lvl7' : pygame.image.load("textures/lvl7_guide.png"),
+    'lvl8' : pygame.image.load("textures/lvl8_guide.png"),
+    'lvl9' : pygame.image.load("textures/lvl9_guide.png"),
+    'lvl10' : pygame.image.load("textures/lvl10_guide.png"),
+    'colorsBlack' : pygame.image.load("textures/lvl9_ui.png"),
 
 }
 
@@ -33,8 +38,8 @@ ui = {
 
 pygame.init()
 
-textMap = levels.levelsList['4']
-numOfLvl = 4
+textMap = levels.levelsList['9']
+numOfLvl = 9
 
 maxSize = pygame.display.Info()
 
@@ -108,18 +113,38 @@ depthCoef = 2
 
 textureSize = 512
 textureScale = textureSize // blockSize
+pygame.display.set_mode((width, height), pygame.FULLSCREEN)
 textures = {
-            '1': pygame.image.load('textures/colorWhiteWall.png'),
-            '2': pygame.image.load('textures/colorYellowWall.png'),
-            '3': pygame.image.load('textures/colorBlueWall.png'),
-            '4': pygame.image.load('textures/colorRedWall.png'),
-            '5': pygame.image.load('textures/colorGreenWall.png'),
-            '<': pygame.image.load('textures/robot.png'),
-            '!': pygame.image.load('textures/blockWallNeedYellow.png'),
-            '@': pygame.image.load('textures/blockWallNeedBlue.png'),
-            '$': pygame.image.load('textures/blockWallNeedRed.png'),
-            '%': pygame.image.load('textures/blockWallNeedGreen.png'),
-            'o': pygame.image.load('textures/blockNumberOne.png'),
+            '1': pygame.image.load('textures/colorWhiteWall.png').convert(),
+            '2': pygame.image.load('textures/colorYellowWall.png').convert(),
+            '3': pygame.image.load('textures/colorBlueWall.png').convert(),
+            '4': pygame.image.load('textures/colorRedWall.png').convert(),
+            '5': pygame.image.load('textures/colorGreenWall.png').convert(),
+            '<': pygame.image.load('textures/robot.png').convert(),
+            '!': pygame.image.load('textures/blockWallNeedYellow.png').convert(),
+            '@': pygame.image.load('textures/blockWallNeedBlue.png').convert(),
+            '$': pygame.image.load('textures/blockWallNeedRed.png').convert(),
+            '%': pygame.image.load('textures/blockWallNeedGreen.png').convert(),
+            'o': pygame.image.load('textures/blockNumberOne.png').convert(),
             }
+
+textures['2'] = pygame.image.load('textures/colorYellowWallBlack.png').convert()
+textures['3'] =  pygame.image.load('textures/colorBlueWallBlack.png').convert()
+textures['4'] =  pygame.image.load('textures/colorRedWallBlack.png').convert()
+textures['5'] =  pygame.image.load('textures/colorGreenWallBlack.png').convert()
+textures['<'] =  pygame.image.load('textures/robotBlack.png').convert()
+# textures = {
+#             '1': pygame.image.load('textures/colorWhiteWall.png'),
+#             '2': pygame.image.load('textures/colorYellowWall.png'),
+#             '3': pygame.image.load('textures/colorBlueWall.png'),
+#             '4': pygame.image.load('textures/colorRedWall.png'),
+#             '5': pygame.image.load('textures/colorGreenWall.png'),
+#             '<': pygame.image.load('textures/robot.png'),
+#             '!': pygame.image.load('textures/blockWallNeedYellow.png'),
+#             '@': pygame.image.load('textures/blockWallNeedBlue.png'),
+#             '$': pygame.image.load('textures/blockWallNeedRed.png'),
+#             '%': pygame.image.load('textures/blockWallNeedGreen.png'),
+#             'o': pygame.image.load('textures/blockNumberOne.png'),
+#             }
 
 
