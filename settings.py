@@ -2,30 +2,7 @@ from math import *
 import pygame.image
 import pygame
 import levels
-import ray_casting
-
-ui = {
-    'mouse1' : pygame.image.load("textures/mouse1_button.png"),
-    'mouse2' : pygame.image.load("textures/mouse2_button.png"),
-    'mouse3' : pygame.image.load("textures/mouse3_button.png"),
-    '3' : pygame.image.load("textures/blue_ui.png"),
-    '2' : pygame.image.load("textures/yellow_ui.png"),
-    '4' : pygame.image.load("textures/red_ui.png"),
-    '5' : pygame.image.load("textures/green_ui.png"),
-    'wrong' : pygame.image.load("textures/wrong_ui.png"),
-    'lvl1' : pygame.image.load("textures/lvl1_guide.png"),
-    'lvl2' : pygame.image.load("textures/lvl2_guide.png"),
-    'lvl3' : pygame.image.load("textures/lvl3_guide.png"),
-    'lvl4' : pygame.image.load("textures/lvl4_guide.png"),
-    'lvl5' : pygame.image.load("textures/lvl5_guide.png"),
-    'lvl6' : pygame.image.load("textures/lvl6_guide.png"),
-    'lvl7' : pygame.image.load("textures/lvl7_guide.png"),
-    'lvl8' : pygame.image.load("textures/lvl8_guide.png"),
-    'lvl9' : pygame.image.load("textures/lvl9_guide.png"),
-    'lvl10' : pygame.image.load("textures/lvl10_guide.png"),
-    'colorsBlack' : pygame.image.load("textures/lvl9_ui.png"),
-
-}
+import json as js
 
 # 1 - white
 # 2 - yellow
@@ -36,10 +13,27 @@ ui = {
 # 7 - red
 # 8 - blue
 
+
 pygame.init()
 
-textMap = levels.levelsList['9']
-numOfLvl = 9
+try:
+    with open("game/settings/settings.json", 'r') as f:
+        sett = js.load(f)
+except:
+    with open("game/settings/settings.json", 'w') as f:
+        sett = {
+            'FOV' : pi / 2,
+            'numRays' : 400,
+            'MAPSCALE' : 10,
+            'numL' : 1,
+            'mouse_sensivity' : 0.15
+        }
+        js.dump(sett, f)
+
+numOfLvl = sett['numL']
+textMap = levels.levelsList[str(numOfLvl)]
+
+mouse_sensivity = sett['mouse_sensivity']
 
 maxSize = pygame.display.Info()
 
@@ -48,13 +42,13 @@ height = 900
 half_width = width / 2
 half_height = height / 2
 
-
+pygame.display.set_mode((width, height), pygame.FULLSCREEN)
 
 blockSize = 100
 rangeColBlock = blockSize//2
 rangeColBlockPlus = blockSize*2
 
-MAPSCALE = 8
+MAPSCALE = sett['MAPSCALE']
 MAPPOS = (0, 0)
 MAP_SIZE_SURF = (width//MAPSCALE*1.5, height//MAPSCALE*1.55)
 MAP_BLOCK_SIZE = blockSize//MAPSCALE
@@ -101,19 +95,22 @@ def initMap(textMap):
         yBlockPos += blockSize
 initMap(textMap)
 
-FOV = pi / 2
+FOV = sett['FOV']
 halfFOV = FOV / 2
 maxDepth = width // blockSize
-numRays = 400
+numRays = sett['numRays']
 deltaRays = FOV / (numRays - 1)
 dist = numRays / (2 * tan(halfFOV))
-coef = dist * blockSize * 6
+coef = dist * blockSize * 2400//numRays
 scale = width // numRays
 depthCoef = 2
 
+
+
+
 textureSize = 512
 textureScale = textureSize // blockSize
-pygame.display.set_mode((width, height), pygame.FULLSCREEN)
+
 textures = {
             '1': pygame.image.load('textures/colorWhiteWall.png').convert(),
             '2': pygame.image.load('textures/colorYellowWall.png').convert(),
@@ -128,23 +125,37 @@ textures = {
             'o': pygame.image.load('textures/blockNumberOne.png').convert(),
             }
 
-textures['2'] = pygame.image.load('textures/colorYellowWallBlack.png').convert()
-textures['3'] =  pygame.image.load('textures/colorBlueWallBlack.png').convert()
-textures['4'] =  pygame.image.load('textures/colorRedWallBlack.png').convert()
-textures['5'] =  pygame.image.load('textures/colorGreenWallBlack.png').convert()
-textures['<'] =  pygame.image.load('textures/robotBlack.png').convert()
-# textures = {
-#             '1': pygame.image.load('textures/colorWhiteWall.png'),
-#             '2': pygame.image.load('textures/colorYellowWall.png'),
-#             '3': pygame.image.load('textures/colorBlueWall.png'),
-#             '4': pygame.image.load('textures/colorRedWall.png'),
-#             '5': pygame.image.load('textures/colorGreenWall.png'),
-#             '<': pygame.image.load('textures/robot.png'),
-#             '!': pygame.image.load('textures/blockWallNeedYellow.png'),
-#             '@': pygame.image.load('textures/blockWallNeedBlue.png'),
-#             '$': pygame.image.load('textures/blockWallNeedRed.png'),
-#             '%': pygame.image.load('textures/blockWallNeedGreen.png'),
-#             'o': pygame.image.load('textures/blockNumberOne.png'),
-#             }
+ui = {
+    'mouse1' : pygame.image.load("textures/mouse1_button.png"),
+    'mouse2' : pygame.image.load("textures/mouse2_button.png"),
+    'mouse3' : pygame.image.load("textures/mouse3_button.png"),
+    '3' : pygame.image.load("textures/blue_ui.png"),
+    '2' : pygame.image.load("textures/yellow_ui.png"),
+    '4' : pygame.image.load("textures/red_ui.png"),
+    '5' : pygame.image.load("textures/green_ui.png"),
+    'wrong' : pygame.image.load("textures/wrong_ui.png"),
+    'lvl1' : pygame.image.load("textures/lvl1_guide.png"),
+    'lvl2' : pygame.image.load("textures/lvl2_guide.png"),
+    'lvl3' : pygame.image.load("textures/lvl3_guide.png"),
+    'lvl4' : pygame.image.load("textures/lvl4_guide.png"),
+    'lvl5' : pygame.image.load("textures/lvl5_guide.png"),
+    'lvl6' : pygame.image.load("textures/lvl6_guide.png"),
+    'lvl7' : pygame.image.load("textures/lvl7_guide.png"),
+    'lvl8' : pygame.image.load("textures/lvl8_guide.png"),
+    'lvl9' : pygame.image.load("textures/lvl9_guide.png"),
+    'lvl10' : pygame.image.load("textures/lvl10_guide.png"),
+    'end1' : pygame.image.load("textures/end1.png"),
+    'end2' : pygame.image.load("textures/end2.png"),
+    'end3' : pygame.image.load("textures/end3.png"),
+    'end4' : pygame.image.load("textures/end4.png"),
+    'end5' : pygame.image.load("textures/theEnd.png"),
+    'colorsBlack' : pygame.image.load("textures/lvl9_ui.png"),
+    'controls' : pygame.image.load("textures/controls.png"),
+    'q' : pygame.image.load("textures/q_button.png"),
+    'press' : pygame.image.load("textures/press.png")
+
+}
+
+
 
 

@@ -10,6 +10,8 @@ import time as t
 import asyncio
 import os
 
+import json as js
+
 import random as rn
 
 import levels
@@ -18,6 +20,8 @@ from ray_casting import *
 from settings import *
 pg.font.init()
 f1 = pg.font.Font(None, 80)
+
+lvlSwitches = False
 
 cur_time = time.time_ns()
 
@@ -59,9 +63,33 @@ class Menu:
                     if pg.mouse.get_pressed()[0]:
                         self.select()
 
+def toBlack():
+    settings.textures['2'] = pygame.image.load('textures/colorYellowWallBlack.png').convert()
+    settings.textures['3'] =  pygame.image.load('textures/colorBlueWallBlack.png').convert()
+    settings.textures['4'] =  pygame.image.load('textures/colorRedWallBlack.png').convert()
+    settings.textures['5'] =  pygame.image.load('textures/colorGreenWallBlack.png').convert()
+    settings.textures['<'] =  pygame.image.load('textures/robotBlack.png').convert()
+    ui['3'] = pygame.image.load("textures/blue_uiBlack.png")
+    ui['2'] = pygame.image.load("textures/yellow_uiBlack.png")
+    ui['4'] = pygame.image.load("textures/red_uiBlack.png")
+    ui['5'] = pygame.image.load("textures/green_uiBlack.png")
+
+def toColor():
+    settings.textures['2'] = pygame.image.load('textures/colorYellowWall.png').convert()
+    settings.textures['3'] =  pygame.image.load('textures/colorBlueWall.png').convert()
+    settings.textures['4'] =  pygame.image.load('textures/colorRedWall.png').convert()
+    settings.textures['5'] =  pygame.image.load('textures/colorGreenWall.png').convert()
+    settings.textures['<'] =  pygame.image.load('textures/robot.png').convert()
+    ui['3'] = pygame.image.load("textures/blue_ui.png")
+    ui['2'] = pygame.image.load("textures/yellow_ui.png")
+    ui['4'] = pygame.image.load("textures/red_ui.png")
+    ui['5'] = pygame.image.load("textures/green_ui.png")
 
 def lvlSwitch():
     settings.textMap = levels.levelsList[str(settings.numOfLvl)]
+    with open("game/settings/settings.json", 'w') as f:
+        settings.sett['numL'] = settings.numOfLvl
+        js.dump(settings.sett, f)
     print(settings.numOfLvl)
     main.tempbackup.clear()
     main.coloredBlocks.clear()
@@ -71,36 +99,40 @@ def lvlSwitch():
     main.blocks_draw_avaliable.clear()
     main.countOfDraw = 0
     main.blockClickAvaliable = 0
-    if settings.numOfLvl == 2:
+    if settings.numOfLvl == 1:
+        main.player.x = 500
+        main.player.y = 480
+    elif settings.numOfLvl == 2:
         main.player.x = 250
         main.player.y = 300
+        toColor()
     elif settings.numOfLvl == 3:
         main.player.x = 2250
         main.player.y = 150
+        toColor()
     elif settings.numOfLvl == 9:
         main.player.x = 160
         main.player.y = 150
-        settings.textures['2'] = pygame.image.load('textures/colorYellowWallBlack.png').convert()
-        settings.textures['3'] =  pygame.image.load('textures/colorBlueWallBlack.png').convert()
-        settings.textures['4'] =  pygame.image.load('textures/colorRedWallBlack.png').convert()
-        settings.textures['5'] =  pygame.image.load('textures/colorGreenWallBlack.png').convert()
-        settings.textures['<'] =  pygame.image.load('textures/robotBlack.png').convert()
-    else:
+        toBlack()
+    elif settings.numOfLvl == 10:
+        main.player.x = 500
+        main.player.y = 480
+        toColor()
+    else:   
         main.player.x = 160
         main.player.y = 150
+        toColor()
     main.menuFalse()
     settings.initMap(settings.textMap)
-
 def restart():
     main.display.blit(ui[f'lvl{settings.numOfLvl}'], (0,0))
     if pg.key.get_pressed()[pg.K_SPACE]: 
         main.restartBool = False
-        main.player.x = 160
-        main.player.y = 150
         lvlSwitch()
         
 
-def switcher():   
+def switcher():  
+    global lvlSwitches 
     main.display.blit(ui[f'lvl{settings.numOfLvl+1}'], (0,0))
     main.timer = False
     if pg.key.get_pressed()[pg.K_SPACE]:
@@ -109,9 +141,12 @@ def switcher():
         settings.numOfLvl += 1 
         lvlSwitch()
         main.timer = True
+        level5_quest.clear()
+        lvlSwitches = False
     
 
 def quest(lvl):
+    global lvlSwitches
     tmp = []
     for blockNeed in blockQuest:
         if blockQuest[blockNeed] == '@':
@@ -160,18 +195,35 @@ def quest(lvl):
             return False
     elif settings.numOfLvl == 6 or settings.numOfLvl == 7:
         if len(tmp) >= 2:
-            switcher()
+            lvlSwitches = True
+            switcher()  
             return True
         else:
             main.doubleQuest = False
             return False
     elif settings.numOfLvl == 8:
         if len(tmp) >= 3:
+            lvlSwitches = True
             switcher()
             return True
         else:
             main.doubleQuest = False
             return False
+    elif settings.numOfLvl == 9:
+        if len(tmp) >= 4:
+            switcher()
+            return True
+        else:
+            main.doubleQuest = False
+            return False
+    elif settings.numOfLvl == 10:
+        if len(tmp) >= 2:
+            main.lastLvlCompl = True
+            return True
+        else:
+            main.doubleQuest = False
+            return False
+            
 
 def fullscreenSwicth():
     if not main.fullscreenActive:

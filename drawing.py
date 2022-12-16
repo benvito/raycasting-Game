@@ -17,7 +17,7 @@ class Drawing:
         pg.draw.rect(self.surf, (9, 5, 5), (0, half_height, width, half_height))
 
     def world(self, player):
-        ray_casting.rayCasting(self.surf, player)
+        rayCasting(self.surf, player)
 
     def info(self, clock, player):
         display_fps = str(int((clock.get_fps())))
