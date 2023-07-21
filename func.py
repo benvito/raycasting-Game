@@ -7,9 +7,6 @@ import settings
 import pygame.event
 import time as t
 
-import asyncio
-import os
-
 import json as js
 
 import random as rn

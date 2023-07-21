@@ -33,6 +33,7 @@ except:
 numOfLvl = sett['numL']
 textMap = levels.levelsList[str(numOfLvl)]
 
+
 mouse_sensivity = sett['mouse_sensivity']
 
 maxSize = pygame.display.Info()

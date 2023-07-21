@@ -1,11 +1,8 @@
 import pygame as pg
 import time
 from math import *
-
-import asyncio
 import random as rn
 import main
-import ray_casting
 import settings
 from settings import *
 from player import Player
@@ -15,7 +12,6 @@ import ray_casting
 import levels
 import time as t
 from drawing import Drawing
-import threading
 
 pg.init()
 f1 = pg.font.Font(None, 80)
